@@ -15,7 +15,7 @@ function AllUsers() {
         );
         setUsers(response.data);
       } catch (error) {
-        toast.error("Failed to fetch users from API!");
+        toast.error("Failed to fetch users from API!", { autoClose: 3000 });
         console.error("API fetch error:", error);
       }
     };
@@ -32,11 +32,16 @@ function AllUsers() {
       await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
       const updatedUsers = users.filter((user) => user.id !== id);
       setUsers(updatedUsers);
-      toast.success("User deleted successfully!");
+      toast.success("User deleted successfully!", { autoClose: 3000 });
     } catch (error) {
-      toast.error("Failed to delete user!");
+      toast.error("Failed to delete user!", { autoClose: 3000 });
       console.error("API delete error:", error);
     }
+  };
+
+  const splitName = (fullName) => {
+    const [firstName, ...lastName] = fullName.split(" ");
+    return { firstName, lastName: lastName.join(" ") };
   };
 
   return (
@@ -49,45 +54,54 @@ function AllUsers() {
               <tr>
                 <th className="py-2 px-4 border-b text-left">S.no</th>
                 <th className="py-2 px-4 border-b text-left">ID</th>
-                <th className="py-2 px-4 border-b text-left">Name</th>
+                <th className="py-2 px-4 border-b text-left">First Name</th>
+                <th className="py-2 px-4 border-b text-left">Last Name</th>
                 <th className="py-2 px-4 border-b text-left">Email</th>
                 <th className="py-2 px-4 border-b text-left">Department</th>
                 <th className="py-2 px-4 border-b text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
-                <tr
-                  key={user.id}
-                  className={`hover:bg-teal-100  ${
-                    index % 2 !== 0 ? "bg-slate-200" : "bg-slate-100"
-                  }`}
-                >
-                  <td className="py-2 px-4 border-b text-left">{index + 1}</td>
-                  <td className="py-2 px-4 border-b text-left">{user.id}</td>
-                  <td className="py-2 px-4 border-b text-left">
-                    {user.name || `${user.firstName} ${user.lastName}`}
-                  </td>
-                  <td className="py-2 px-4 border-b text-left">{user.email}</td>
-                  <td className="py-2 px-4 border-b text-left">
-                    {user.department || "N/A"}
-                  </td>
-                  <td className="py-2 px-4 border-b text-left flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
-                    <button
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                      onClick={() => handleEdit(user)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {users.map((user, index) => {
+                const { firstName, lastName } = splitName(user.name || "");
+                return (
+                  <tr
+                    key={user.id}
+                    className={`hover:bg-teal-100 ${
+                      index % 2 !== 0 ? "bg-slate-200" : "bg-slate-100"
+                    }`}
+                  >
+                    <td className="py-2 px-4 border-b text-left">
+                      {index + 1}
+                    </td>
+                    <td className="py-2 px-4 border-b text-left">{user.id}</td>
+                    <td className="py-2 px-4 border-b text-left">
+                      {firstName}
+                    </td>
+                    <td className="py-2 px-4 border-b text-left">{lastName}</td>
+                    <td className="py-2 px-4 border-b text-left">
+                      {user.email}
+                    </td>
+                    <td className="py-2 px-4 border-b text-left">
+                      {user.department || "N/A"}
+                    </td>
+                    <td className="py-2 px-4 border-b text-left flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                        onClick={() => handleEdit(user)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
