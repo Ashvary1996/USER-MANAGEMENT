@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 
 const UserForm = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +19,6 @@ const UserForm = () => {
 
   const validateForm = () => {
     const { firstName, lastName, email, department } = formData;
-
     if (!firstName) {
       toast.error("First Name is required!");
       return false;
@@ -32,11 +31,6 @@ const UserForm = () => {
       toast.error("Email is required!");
       return false;
     }
-
-    if (!email) {
-      toast.error("Email is required!");
-      return false;
-    }
     if (!department) {
       toast.error("Department is required!");
       return false;
@@ -44,28 +38,24 @@ const UserForm = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      const newUser = {
-        id: uuidv4(),
-        ...formData,
-      };
-
-      const savedUsers = JSON.parse(localStorage.getItem("users")) || [];
-      savedUsers.push(newUser);
-      localStorage.setItem("users", JSON.stringify(savedUsers));
-
-      toast.success("User created successfully!");
-
-      console.log("New User:", newUser);
-
-      // setFormData({
-      //   firstName: "",
-      //   lastName: "",
-      //   email: "",
-      //   department: "",
-      // });
+      try {
+        await axios.post(
+          "https://jsonplaceholder.typicode.com/users",
+          formData
+        );
+        toast.success("User created successfully!");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          department: "",
+        });
+      } catch (error) {
+        toast.error("Failed to create user!");
+      }
     }
   };
 
@@ -85,6 +75,7 @@ const UserForm = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-teal-500"
               placeholder="Enter first name"
+              required
             />
           </div>
           <div className="mb-4">
@@ -96,6 +87,7 @@ const UserForm = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-teal-500"
               placeholder="Enter last name"
+              required
             />
           </div>
           <div className="mb-4">
@@ -107,6 +99,7 @@ const UserForm = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-teal-500"
               placeholder="Enter email"
+              required
             />
           </div>
           <div className="mb-4">
@@ -118,6 +111,7 @@ const UserForm = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-teal-500"
               placeholder="Enter department"
+              required
             />
           </div>
           <button
